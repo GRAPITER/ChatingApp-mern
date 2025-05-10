@@ -28,5 +28,5 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw?   
 " | Out-File -FilePath .gitignore
