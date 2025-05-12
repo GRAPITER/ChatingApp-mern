@@ -152,3 +152,18 @@ export async function profile(req, res) {
     });
   }
 }
+
+export async function checkAuth(req, res) {
+  try {
+    res.status(202).json({
+      success: true,
+      data: req.user,
+    });
+  } catch (error) {
+    console.log("there is an error ochecking auth", error);
+    res.status(404).json({
+      success: false,
+      message: "there is an error checking auth",
+    });
+  }
+}
