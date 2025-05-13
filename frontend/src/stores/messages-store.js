@@ -2,18 +2,17 @@ import { create } from "zustand";
 import { axiosInstanse } from "../lib/axios";
 import toast from "react-hot-toast";
 
-export const useMessageStore = create((set) => ({
+export const useMessageStore = create((set, get) => ({
   users: [],
   messages: [],
   selectedUser: null,
   isUserFetching: false,
   isMessageFetching: false,
   userFetch: async () => {
-    set({ isUserFetching: true });
     try {
+      set({ isUserFetching: true });
       const res = await axiosInstanse.get("/message/allUser");
-      set({ users: res.data });
-      console.log(res.data);
+      set({ users: res.data.data });
     } catch (error) {
       console.log("from getting user", error);
     } finally {
@@ -32,6 +31,20 @@ export const useMessageStore = create((set) => ({
       set({ isMessageFetching: false });
     }
   },
+
+  sendMessage: async (data) => {
+    try {
+      const { selectedUser, messages } = get();
+      const res = await axiosInstanse.post(
+        `message/send/${selectedUser._id}`,
+        data
+      );
+      set({ messages: [...messages, res.data] });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
   //todo optimized later
   setSelectedUser: (user) => {
     set({ selectedUser: user });

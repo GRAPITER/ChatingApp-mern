@@ -70,7 +70,7 @@ export async function sendMessages(req, res) {
       image: imageUrl,
     });
 
-    res.status(201).json(newMessage);
+    res.status(201).json(post);
   } catch (error) {
     res.status(400).json({
       success: false,
