@@ -1,18 +1,20 @@
 import { create } from "zustand";
 import { axiosInstanse } from "../lib/axios";
 import toast from "react-hot-toast";
-
-export const useAuthStore = create((set) => ({
+import io from "socket.io-client";
+export const useAuthStore = create((set, get) => ({
   userAuth: null,
   isCheckingAuth: true,
   isSigningUp: false,
   isLogingIn: false,
   isUploadingProfile: false,
   onlineUsers: [],
+  socket: null,
   checkAuth: async () => {
     try {
       const res = await axiosInstanse.get("/auth/checkauth");
       set({ userAuth: res.data });
+      get().connectSocket();
     } catch (error) {
       console.log("there is an error on checking auth", error);
       set({ userAuth: null });
@@ -26,7 +28,7 @@ export const useAuthStore = create((set) => ({
       console.log("data which filled by user who want to be signed in", data);
       const res = await axiosInstanse.post("/auth/signup", data);
       set({ userAuth: res.data });
-      console.log("this is the response which server send to us", res);
+      get().connectSocket();
       toast.success("user signup successfully");
     } catch (error) {
       console.log(error.response.data.message);
@@ -41,7 +43,7 @@ export const useAuthStore = create((set) => ({
       set({ isLogingIn: true });
       const res = await axiosInstanse.post("/auth/login", data);
       set({ userAuth: res.data });
-
+      get().connectSocket();
       toast.success("successfully looged in");
     } catch (error) {
       console.log(error);
@@ -55,7 +57,7 @@ export const useAuthStore = create((set) => ({
     try {
       await axiosInstanse.post("/auth/logout");
       set({ userAuth: null });
-
+      get().disconnectSocket();
       toast.success("Logout suucessfully");
     } catch (error) {
       console.log(error);
@@ -73,5 +75,17 @@ export const useAuthStore = create((set) => ({
     } finally {
       set({ isUploadingProfile: false });
     }
+  },
+
+  connectSocket: () => {
+    const { userAuth } = get();
+    if (!userAuth || get().socket?.connected) return;
+    const socket = io("http://localhost:3000");
+    socket.connect();
+    set({ socket: socket });
+  },
+
+  disconnectSocket: () => {
+    if (get().socket?.connected) get().socket.disconnect();
   },
 }));

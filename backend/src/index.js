@@ -6,7 +6,8 @@ import connectToDB from "./database/data.js";
 import authRouter from "./routes/auth-route.js";
 import cors from "cors";
 import router from "./routes/message-route.js";
-const app = express();
+import { app, server, io } from "./libs/socket.js";
+
 const PORT = process.env.PORT;
 
 connectToDB();
@@ -23,6 +24,6 @@ app.use(
 app.use("/api/auth", authRouter);
 app.use("/api/message", router);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`connected to the Port ${PORT}`);
 });
