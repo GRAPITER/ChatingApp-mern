@@ -15,7 +15,7 @@ export default function UserChat() {
     messageFetch(selectedUser._id);
   }, [selectedUser._id, messageFetch]);
 
-  if (isMessageFetching && !userAuth && !selectedUser)
+  if (isMessageFetching)
     return (
       <div className="flex h-screen justify-center items-center">
         {" "}

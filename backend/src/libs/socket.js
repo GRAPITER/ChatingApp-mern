@@ -12,11 +12,23 @@ const io = new Server(server, {
   },
 });
 
+//use to store online user
+const userSocketMap = {};
+
 io.on("connection", (socket) => {
   console.log("a user connected", socket.id);
 
+  const userId = socket.handshake.query.userId;
+  console.log("userID of shakeHand query", userId);
+  if (userId) userSocketMap[userId] = socket.id;
+  console.log(userSocketMap);
+
+  io.emit("currentlyConnectedUser", Object.keys(userSocketMap));
+
   socket.on("disconnect", () => {
     console.log("A user disconnected", socket.id);
+    delete userSocketMap[userId];
+    io.emit("currentlyConnectedUser", Object.keys(userSocketMap));
   });
 });
 

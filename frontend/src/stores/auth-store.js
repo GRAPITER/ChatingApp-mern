@@ -14,6 +14,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstanse.get("/auth/checkauth");
       set({ userAuth: res.data });
+      console.log("UserAuth", get().userAuth.data);
       get().connectSocket();
     } catch (error) {
       console.log("there is an error on checking auth", error);
@@ -25,7 +26,6 @@ export const useAuthStore = create((set, get) => ({
   signUp: async (data) => {
     try {
       set({ isSigningUp: true });
-      console.log("data which filled by user who want to be signed in", data);
       const res = await axiosInstanse.post("/auth/signup", data);
       set({ userAuth: res.data });
       get().connectSocket();
@@ -80,9 +80,17 @@ export const useAuthStore = create((set, get) => ({
   connectSocket: () => {
     const { userAuth } = get();
     if (!userAuth || get().socket?.connected) return;
-    const socket = io("http://localhost:3000");
+    const socket = io("http://localhost:3000", {
+      query: {
+        userId: userAuth.data._id,
+      },
+    });
     socket.connect();
     set({ socket: socket });
+
+    socket.on("currentlyConnectedUser", (s) => {
+      set({ onlineUsers: s });
+    });
   },
 
   disconnectSocket: () => {
