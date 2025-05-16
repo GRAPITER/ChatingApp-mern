@@ -5,7 +5,7 @@ import { useAuthStore } from "../../stores/auth-store";
 export default function Navbar() {
   const { userAuth, logout } = useAuthStore();
   return (
-    <div className="h-16 flex justify-between max-w-7xl m-auto bg-base-100">
+    <div className="h-16 flex justify-between max-w-5xl m-auto bg-base-100">
       <div className="flex justify-center items-center gap-3">
         <Link to="/">
           <Cake className="size-10 text-primary" />
@@ -15,12 +15,6 @@ export default function Navbar() {
         </div>
       </div>
       <div className="flex justify-center items-center gap-3">
-        <Link
-          to={"/setting"}
-          className="flex justify-center items-center gap-2 btn h-8 rounded-2xl"
-        >
-          <Settings className="size-5" /> setting
-        </Link>
         {userAuth && (
           <>
             {" "}

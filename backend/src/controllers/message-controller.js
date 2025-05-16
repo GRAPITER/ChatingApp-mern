@@ -1,6 +1,7 @@
 import User from "../modals/user.js";
 import Message from "../modals/message-modal.js";
 import cloudinary from "../libs/cloudinary.js";
+import { getRecieverSocket, io } from "../libs/socket.js";
 
 //ok so in sidebar of application we show the user who is currently logged in so we goona fetch all user expect me real quick
 export async function allUser(req, res) {
@@ -38,13 +39,13 @@ export async function getMessages(req, res) {
     const messages = await Message.find({
       $or: [
         { senderId: myId, recieverID: toChatWith },
-        { recieverID: toChatWith, senderId: myId },
+        { senderId: toChatWith, recieverID: myId },
       ],
     });
 
     res.status(200).json(messages);
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       success: false,
       message: "can not fetch all messages",
     });
@@ -69,6 +70,11 @@ export async function sendMessages(req, res) {
       text: message,
       image: imageUrl,
     });
+
+    const recieverSocketId = getRecieverSocket(receiverId);
+    if (recieverSocketId) {
+      io.to(recieverSocketId).emit("userNewMessage", post);
+    }
 
     res.status(201).json(post);
   } catch (error) {

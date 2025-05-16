@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useMessageStore } from "../../stores/messages-store";
 import { Loader } from "lucide-react";
 import ChatHeader from "./ChatHeader";
@@ -6,14 +6,38 @@ import ChatInput from "./ChatInput";
 import { useAuthStore } from "../../stores/auth-store";
 import Time from "react-time-format";
 export default function UserChat() {
-  const { messages, messageFetch, isMessageFetching, selectedUser } =
-    useMessageStore();
+  const {
+    messages,
+    messageFetch,
+    isMessageFetching,
+    selectedUser,
+    SubscribeMessageSocket,
+    unSubscribeMessageSocet,
+  } = useMessageStore();
 
   const { userAuth } = useAuthStore();
 
+  const chatRefScroll = useRef(null);
+
+  function scrollToBottom() {
+    chatRefScroll.current.scrollIntoView({ behavior: "smooth" });
+  }
+
   useEffect(() => {
     messageFetch(selectedUser._id);
-  }, [selectedUser._id, messageFetch]);
+    SubscribeMessageSocket();
+
+    return () => unSubscribeMessageSocet();
+  }, [
+    selectedUser._id,
+    messageFetch,
+    SubscribeMessageSocket,
+    unSubscribeMessageSocet,
+  ]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   if (isMessageFetching)
     return (
@@ -69,6 +93,7 @@ export default function UserChat() {
             </div>
           );
         })}
+        <div ref={chatRefScroll}></div>
       </div>
       <ChatInput />
     </div>
