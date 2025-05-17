@@ -6,6 +6,7 @@ import connectToDB from "./database/data.js";
 import authRouter from "./routes/auth-route.js";
 import cors from "cors";
 import router from "./routes/message-route.js";
+import path from "path";
 import { app, server, io } from "./libs/socket.js";
 
 const PORT = process.env.PORT;
